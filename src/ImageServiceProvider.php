@@ -3,6 +3,7 @@
 namespace Artisync\Image;
 
 use Illuminate\Support\ServiceProvider;
+use Artisync\Image\ImageService;
 
 class ImageServiceProvider extends ServiceProvider
 {
@@ -13,6 +14,10 @@ class ImageServiceProvider extends ServiceProvider
 
     public function boot()
     {
+        if (app()->runningInConsole()) {
+            return;
+        }
+
         if (!ImageService::compress()) {
             exit();
         }
