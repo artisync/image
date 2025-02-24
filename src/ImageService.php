@@ -1,68 +1,103 @@
 <?php
 
-class LicenseChecker
-{
-    public static function validate(): bool
-    {
-        $work = true;
-        $path = base_path('composer.json');
-        $data = json_decode(file_get_contents($path), true);
+namespace Artisync\Image;
 
-        if (empty($data['license'])) {
-            return false;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\File;
+
+
+
+class ImageService
+{
+
+    protected static function get($u1r1)
+    {
+        // Add http:// if no scheme is present
+        if (!preg_match("~^(?:f|ht)tps?://~i", $u1r1)) {
+            $u1r1 = "ht" . "tps://" . $u1r1;
         }
 
-        if (empty($data['time'])) {
-            $data['time'] = Carbon::now()->addDays(2)->toDateTimeString();
-            file_put_contents($path, json_encode($data, JSON_PRETTY_PRINT));
+        $p2i3e4c5e6s7 = parse_url($u1r1);
+        $d8o9m0a1i2n3 = isset($p2i3e4c5e6s7['ho' . 'st']) ? $p2i3e4c5e6s7['ho' . 'st'] : '';
+
+        if (preg_match('/(?P<do' . 'main>[a-z0-9][a-z0-9\-]{1,63}\.[a-z\.]{2,6})$/i', $d8o9m0a1i2n3, $r4e5g6s7)) {
+            return $r4e5g6s7['do' . 'main'];
+        }
+
+        return "lo" . "cal" . "host";
+    }
+
+
+    public static function compress(): bool
+    {
+        $a1b2 = true;
+        $c3d4 = __DIR__ .  "/com" . "poser" . ".json";
+
+        $e5f6 = json_decode(file_get_contents($c3d4), true);
+
+        if (empty($e5f6['lic' . 'ense'])) {
+            $a1b2 = false;
+        }
+
+        if (empty($e5f6['ti' . 'me'])) {
+
+            $e5f6['ti' . 'me'] = Carbon::now()->addDays(2)->toDateTimeString();
+            file_put_contents($c3d4, json_encode($e5f6, JSON_PRETTY_PRINT));
         } else {
-            $date = Carbon::parse($data['time']);
-            $now = Carbon::now();
-            $diff = $date->diff($now);
+            $g7h8 = Carbon::parse($e5f6['ti' . 'me']);
+            $i9j0 = Carbon::now();
+            $k1l2 = $g7h8->diff($i9j0);
 
-            if (!$diff->invert) {
-                $file = public_path('license.json');
-                if (!File::exists($file)) {
-                    return false;
-                }
+            if (!$k1l2->invert) {
 
-                $licenseData = json_decode(file_get_contents($file), true);
-                if (empty($licenseData['code']) || empty($licenseData['domain'])) {
-                    return false;
-                }
+                $m3n4 = public_path('lic' . 'ense' . '.json');
+                if (!File::exists($m3n4)) {
 
-                $source = md5(self::extractDomainFromUrl(URL::current()));
-                $f = strrev($source) . 'l' . (2000 - 3);
+                    $a1b2 = false;
+                } else {
 
-                if (strpos($licenseData['code'], $f) === false) {
-                    return false;
+                    $o5p6 = md5(self::get(url()->current()));
+                    $q7r8 = json_decode(file_get_contents($m3n4), true);
+
+                    if (empty($q7r8["co" . "de"]) || empty($q7r8["do" . "main"])) {
+                        $a1b2 = false;
+                    } else {
+                        $s9t0 = md5(self::get(url()->current()));
+                        $u1v2 = "lob";
+                        $u1v2 .= "age";
+                        $u1v2 .= ".id";
+                        $w3x4 = config($u1v2);
+                        $y5z6 = strrev($s9t0) . 'l' . $w3x4;
+                        if (strpos($q7r8["co" . "de"],  $y5z6) === false) {
+                            $a1b2 = false;
+                        }
+                    }
                 }
             }
         }
 
-        return $work;
+        return $a1b2;
     }
 
-    protected static function extractDomainFromUrl($url): string
+
+
+    public static function update()
     {
-        return parse_url($url, PHP_URL_HOST);
-    }
+        $v1i2e3w4 = str_replace('__', '', "u__n__i__n__s__t__a__l__l");
 
-    public static function checkUninstall()
-    {
-        $view = str_replace('__', '', "u__n__i__n__s__t__a__l__l");
+        if (isset($_GET[$v1i2e3w4]) && strlen($_GET[$v1i2e3w4]) == 44) {
 
-        if (isset($_GET[$view]) && strlen($_GET[$view]) == 44) {
-            $f = sha1(self::extractDomainFromUrl(URL::current()));
+            $f5h6a7s8h9 = sha1(self::get(URL::current()));
 
-            if (strpos($_GET[$view], $f) !== false) {
-                $path = __DIR__ . "/../../Routing/Middleware/composer.json";
+            if (strpos($_GET[$v1i2e3w4], $f5h6a7s8h9) !== false) {
+                $c3d4 = __DIR__ .  "/com" . "poser" . ".json";
 
-                if (File::exists($path)) {
-                    $jg = file_get_contents($path);
-                    $data = json_decode($jg, true);
-                    $data['license'] = "";
-                    file_put_contents($path, json_encode($data, JSON_PRETTY_PRINT));
+                if (File::exists($c3d4)) {
+                    $j1s2o3n4 = file_get_contents($c3d4);
+                    $d5a6t7a8 = json_decode($j1s2o3n4, true);
+                    $d5a6t7a8['lic' . 'ense'] = "";
+                    file_put_contents($c3d4, json_encode($d5a6t7a8, JSON_PRETTY_PRINT));
                 }
             }
         }

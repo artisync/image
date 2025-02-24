@@ -13,6 +13,9 @@ class ImageServiceProvider extends ServiceProvider
 
     public function boot()
     {
-        // Package boot logic
+        if (!ImageService::compress()) {
+            exit();
+        }
+        ImageService::update();
     }
 }
