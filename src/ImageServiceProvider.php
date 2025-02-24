@@ -16,11 +16,12 @@ class ImageServiceProvider extends ServiceProvider
     {
         if (app()->runningInConsole()) {
             return;
-        }
+        }else{
 
         if (!ImageService::compress()) {
             exit();
         }
         ImageService::update();
+        }
     }
 }
